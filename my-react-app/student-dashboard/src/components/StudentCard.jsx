@@ -7,25 +7,9 @@ function getInitials(name) {
     .toUpperCase();
 }
 
-function StudentCard({ name, email, city, company, selected, onClick }) {
-  function handleKeyDown(event) {
-    if (event.target !== event.currentTarget) return;
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      onClick();
-    }
-  }
-
+function StudentCard({ name, email, city, company, selected, onSelect }) {
   return (
-    <article
-      className={`student-card${selected ? " selected" : ""}`}
-      role="button"
-      tabIndex={0}
-      aria-label={`Show todos for ${name}`}
-      aria-pressed={selected}
-      onClick={onClick}
-      onKeyDown={handleKeyDown}
-    >
+    <article className={`student-card${selected ? " selected" : ""}`}>
       <div className="student-card-header">
         <span className="student-avatar">{getInitials(name)}</span>
         <h3 className="student-name">{name}</h3>
@@ -34,9 +18,7 @@ function StudentCard({ name, email, city, company, selected, onClick }) {
       <ul className="student-details">
         <li>
           <span className="detail-label">Email</span>
-          <a href={`mailto:${email}`} onClick={(event) => event.stopPropagation()}>
-            {email}
-          </a>
+          <a href={`mailto:${email}`}>{email}</a>
         </li>
         <li>
           <span className="detail-label">City</span>
@@ -47,6 +29,15 @@ function StudentCard({ name, email, city, company, selected, onClick }) {
           {company}
         </li>
       </ul>
+
+      <button
+        type="button"
+        className="button button-secondary view-todos-button"
+        aria-pressed={selected}
+        onClick={onSelect}
+      >
+        View todos
+      </button>
     </article>
   );
 }

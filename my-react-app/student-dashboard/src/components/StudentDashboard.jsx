@@ -68,7 +68,8 @@ function StudentDashboard() {
     const matchesCity = selectedCity === "" || student.city === selectedCity;
     return matchesSearch && matchesCity;
   });
-  const selectedStudent = students.find(
+  // Search the visible students, so the panel closes if its card is filtered out
+  const selectedStudent = filteredStudents.find(
     (student) => student.id === selectedStudentId,
   );
 
@@ -104,8 +105,14 @@ function StudentDashboard() {
           onFieldChange={setSearchField}
         />
 
-        <div className="city-filter" role="group" aria-label="Filter by city">
-          <span className="filter-label">Filter by city</span>
+        <div
+          className="city-filter"
+          role="group"
+          aria-labelledby="city-filter-label"
+        >
+          <span id="city-filter-label" className="filter-label">
+            Filter by city
+          </span>
           <div className="city-chips">
             <button
               type="button"
@@ -132,7 +139,11 @@ function StudentDashboard() {
         {filteredStudents.length === 0 ? (
           <div className="empty-state">
             <p>No students match the selected search and city filters.</p>
-            <button className="button button-secondary" onClick={clearFilters}>
+            <button
+              type="button"
+              className="button button-secondary"
+              onClick={clearFilters}
+            >
               Clear filters
             </button>
           </div>
@@ -146,7 +157,7 @@ function StudentDashboard() {
                 city={student.city}
                 company={student.company}
                 selected={selectedStudentId === student.id}
-                onClick={() => setSelectedStudentId(student.id)}
+                onSelect={() => setSelectedStudentId(student.id)}
               />
             ))}
           </div>

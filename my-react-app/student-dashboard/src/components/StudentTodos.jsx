@@ -1,11 +1,19 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Loader from "./Loader";
+import ErrorMessage from "./ErrorMessage";
 
 function StudentTodos({ student, onClose }) {
   const [status, setStatus] = useState("loading");
-  const [completedCount, setCompletedCount] = useState(0);
-  const [totalCount, setTotalCount] = useState(0);
+  const [result, setResult] = useState({ completed: 0, total: 0 });
   const [retryCount, setRetryCount] = useState(0);
+  const panelRef = useRef(null);
+
+  // Bring the panel into view when it opens (it's below the cards).
+  // The parent gives this component a key per student, so this runs
+  // each time a different student is selected.
+  useEffect(() => {
+    panelRef.current.scrollIntoView({ block: "nearest" });
+  }, []);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -24,8 +32,10 @@ function StudentTodos({ student, onClose }) {
         const todos = await response.json();
         if (controller.signal.aborted) return;
 
-        setCompletedCount(todos.filter((todo) => todo.completed).length);
-        setTotalCount(todos.length);
+        setResult({
+          completed: todos.filter((todo) => todo.completed).length,
+          total: todos.length,
+        });
         setStatus("success");
       } catch (error) {
         if (controller.signal.aborted) return;
@@ -35,7 +45,6 @@ function StudentTodos({ student, onClose }) {
       }
     }
 
-    setStatus("loading");
     fetchTodos();
 
     return () => {
@@ -48,8 +57,37 @@ function StudentTodos({ student, onClose }) {
     setRetryCount((count) => count + 1);
   }
 
+  function renderContent() {
+    if (status === "loading") {
+      return <Loader message={`Loading ${student.name}’s todos...`} />;
+    }
+
+    if (status === "error") {
+      return (
+        <ErrorMessage
+          message="We couldn’t load this student’s todos."
+          onRetry={handleRetry}
+        />
+      );
+    }
+
+    if (result.total === 0) {
+      return <p>{student.name} has no todos yet.</p>;
+    }
+
+    return (
+      <p>
+        {result.completed} of {result.total} todos completed.
+      </p>
+    );
+  }
+
   return (
-    <aside className="student-todos-panel" aria-labelledby="student-todos-title">
+    <aside
+      ref={panelRef}
+      className="student-todos-panel"
+      aria-labelledby="student-todos-title"
+    >
       <div className="student-todos-heading">
         <h3 id="student-todos-title">{student.name}’s Todos</h3>
         <button
@@ -62,23 +100,9 @@ function StudentTodos({ student, onClose }) {
         </button>
       </div>
 
-      {status === "loading" ? (
-        <Loader message={`Loading ${student.name}’s todos...`} />
-      ) : status === "error" ? (
-        <div className="error-box" role="alert">
-          <p>We couldn’t load this student’s todos.</p>
-          <button type="button" className="button" onClick={handleRetry}>
-            Retry
-          </button>
-        </div>
-      ) : (
-        <p>
-          {completedCount} of {totalCount} todos completed.
-        </p>
-      )}
+      {renderContent()}
     </aside>
   );
 }
 
 export default StudentTodos;
-
