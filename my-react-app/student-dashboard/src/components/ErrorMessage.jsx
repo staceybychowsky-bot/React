@@ -1,11 +1,12 @@
-function Loader({ message }) {
+function ErrorMessage({ message, onRetry }) {
   return (
-    <div className="loader" role="status">
-      <span className="spinner" aria-hidden="true"></span>
+    <div className="error-box" role="alert">
       <p>{message}</p>
+      <button type="button" className="button" onClick={onRetry}>
+        Try again
+      </button>
     </div>
   );
 }
 
-export default Loader;
-
+export default ErrorMessage;

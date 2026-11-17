@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import SearchBar from "./SearchBar";
 import StudentCard from "./StudentCard";
+import StudentTodos from "./StudentTodos";
 import Loader from "./Loader";
 import ErrorMessage from "./ErrorMessage";
 
 const API_URL = "https://jsonplaceholder.typicode.com/users";
 
-// Turn an API user into the shape our app uses
 function toStudent(user) {
   return {
     id: user.id,
@@ -19,9 +19,12 @@ function toStudent(user) {
 
 function StudentDashboard() {
   const [students, setStudents] = useState([]);
-  const [status, setStatus] = useState("loading"); // "loading" | "error" | "success"
+  const [status, setStatus] = useState("loading");
   const [retryCount, setRetryCount] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
+  const [searchField, setSearchField] = useState("name");
+  const [selectedCity, setSelectedCity] = useState("");
+  const [selectedStudentId, setSelectedStudentId] = useState(null);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -58,11 +61,21 @@ function StudentDashboard() {
     setRetryCount((count) => count + 1);
   }
 
-  // Calculated during render, never stored in state
   const query = searchTerm.trim().toLowerCase();
-  const filteredStudents = students.filter((student) =>
-    student.name.toLowerCase().includes(query)
+  const cities = [...new Set(students.map((student) => student.city))].sort();
+  const filteredStudents = students.filter((student) => {
+    const matchesSearch = student[searchField].toLowerCase().includes(query);
+    const matchesCity = selectedCity === "" || student.city === selectedCity;
+    return matchesSearch && matchesCity;
+  });
+  const selectedStudent = students.find(
+    (student) => student.id === selectedStudentId,
   );
+
+  function clearFilters() {
+    setSearchTerm("");
+    setSelectedCity("");
+  }
 
   function renderContent() {
     if (status === "loading") {
@@ -84,16 +97,43 @@ function StudentDashboard() {
 
     return (
       <>
-        <SearchBar value={searchTerm} onChange={setSearchTerm} />
+        <SearchBar
+          value={searchTerm}
+          onChange={setSearchTerm}
+          field={searchField}
+          onFieldChange={setSearchField}
+        />
+
+        <div className="city-filter" role="group" aria-label="Filter by city">
+          <span className="filter-label">Filter by city</span>
+          <div className="city-chips">
+            <button
+              type="button"
+              className={`city-chip${selectedCity === "" ? " active" : ""}`}
+              aria-pressed={selectedCity === ""}
+              onClick={() => setSelectedCity("")}
+            >
+              All cities
+            </button>
+            {cities.map((city) => (
+              <button
+                type="button"
+                className={`city-chip${selectedCity === city ? " active" : ""}`}
+                aria-pressed={selectedCity === city}
+                key={city}
+                onClick={() => setSelectedCity(city)}
+              >
+                {city}
+              </button>
+            ))}
+          </div>
+        </div>
 
         {filteredStudents.length === 0 ? (
           <div className="empty-state">
-            <p>No students match "{searchTerm}".</p>
-            <button
-              className="button button-secondary"
-              onClick={() => setSearchTerm("")}
-            >
-              Clear search
+            <p>No students match the selected search and city filters.</p>
+            <button className="button button-secondary" onClick={clearFilters}>
+              Clear filters
             </button>
           </div>
         ) : (
@@ -105,9 +145,19 @@ function StudentDashboard() {
                 email={student.email}
                 city={student.city}
                 company={student.company}
+                selected={selectedStudentId === student.id}
+                onClick={() => setSelectedStudentId(student.id)}
               />
             ))}
           </div>
+        )}
+
+        {selectedStudent && (
+          <StudentTodos
+            key={selectedStudent.id}
+            student={selectedStudent}
+            onClose={() => setSelectedStudentId(null)}
+          />
         )}
       </>
     );
@@ -130,4 +180,3 @@ function StudentDashboard() {
 }
 
 export default StudentDashboard;
-

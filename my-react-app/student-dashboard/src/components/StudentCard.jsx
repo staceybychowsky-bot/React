@@ -7,9 +7,25 @@ function getInitials(name) {
     .toUpperCase();
 }
 
-function StudentCard({ name, email, city, company }) {
+function StudentCard({ name, email, city, company, selected, onClick }) {
+  function handleKeyDown(event) {
+    if (event.target !== event.currentTarget) return;
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      onClick();
+    }
+  }
+
   return (
-    <article className="student-card">
+    <article
+      className={`student-card${selected ? " selected" : ""}`}
+      role="button"
+      tabIndex={0}
+      aria-label={`Show todos for ${name}`}
+      aria-pressed={selected}
+      onClick={onClick}
+      onKeyDown={handleKeyDown}
+    >
       <div className="student-card-header">
         <span className="student-avatar">{getInitials(name)}</span>
         <h3 className="student-name">{name}</h3>
@@ -18,7 +34,9 @@ function StudentCard({ name, email, city, company }) {
       <ul className="student-details">
         <li>
           <span className="detail-label">Email</span>
-          <a href={`mailto:${email}`}>{email}</a>
+          <a href={`mailto:${email}`} onClick={(event) => event.stopPropagation()}>
+            {email}
+          </a>
         </li>
         <li>
           <span className="detail-label">City</span>
@@ -34,4 +52,3 @@ function StudentCard({ name, email, city, company }) {
 }
 
 export default StudentCard;
-
