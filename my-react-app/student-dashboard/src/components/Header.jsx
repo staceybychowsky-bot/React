@@ -6,7 +6,7 @@ const navLinks = [
 
 function Header() {
   return (
-    <header id="top" className="header">
+    <header className="header">
       <div className="header-inner">
         <h1 className="logo">🎓 Student Management Dashboard</h1>
 
