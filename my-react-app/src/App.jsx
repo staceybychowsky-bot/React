@@ -2,13 +2,21 @@ import { useState } from "react";
 //import Lifecycle from "./components/Lifecycle";
 //import WelcomeBanner from "./components/WelcomeBanner";
 //import AutoHideAlert from "./components/AutoHideAlert"; 
-import CounterLogger from "./components/CounterLogger"; 
-import StopWatch from "./components/StopWatch"; 
-import StopwatchToggle from "./components/StopwatchToggle"; 
+//import CounterLogger from "./components/CounterLogger"; 
+//import StopWatch from "./components/StopWatch"; 
+//import StopwatchToggle from "./components/StopwatchToggle"; 
+//import "./App.css";
+import StudentList from "./components/StudentList";
+import KeyDemo from "./components/KeyDemo";
+import ProductList from "./components/ProductList";
+import StudentInfo from "./components/StudentInfo";
+import CountryList from "./components/CountryList";
+import MovieList from "./components/MovieList";
+import CourseList from "./components/CourseList";
 import "./App.css";
 
 function App() {  
-  const [showLifecycle, setShowLifecycle] = useState(true);
+  //const [showLifecycle, setShowLifecycle] = useState(true);
 
   return (  
     //<div className="app">
@@ -24,11 +32,22 @@ function App() {
      // <AutoHideAlert />   
    // </div> 
    
-    <div className="app">
-      <CounterLogger />
-      <StopWatch />
-      <StopwatchToggle />
-    </div>  
+    //<div className="app">
+      //<CounterLogger />
+      //<StopWatch />
+      //<StopwatchToggle />
+    //</div> 
+    
+     <div className="app">
+      <h1>Lesson 3: Lists with map()</h1>
+      <StudentList />
+      <KeyDemo />
+      <ProductList />
+      <StudentInfo />
+      <CountryList />
+      <MovieList />
+      <CourseList />
+    </div>
   );
 }
 
